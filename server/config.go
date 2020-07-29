@@ -7,10 +7,11 @@ import (
 )
 
 type Config struct {
-	ServerPort       string `toml:"server_port"`
+	BindAddress      string `toml:"bind_address"`
 	LogLevel         string `toml:"log_level"`
 	NodeMultiaddress string `toml:"node_multiaddress"`
 	Rendezvous       string `toml:"rendezvous"`
+	SessionKey       string `toml:"session_key"`
 }
 
 // viperEnvVariable loads db information from .env file
@@ -34,15 +35,17 @@ func viperEnvVariable(key, default_value string) string {
 
 // NewConfig creates a new config based on default values or provided .env file
 func NewConfig() *Config {
-	ServerPort := viperEnvVariable("SERVER_PORT", ":8000")
+	BindAddress := viperEnvVariable("BIND_ADDRESS", ":8000")
 	LogLevel := viperEnvVariable("LOG_LEVEL", "debug")
 	NodeMultiaddress := viperEnvVariable("NODE_MULTIADDRESS", "/ip4/127.0.0.1/tcp/0")
 	Rendezvous := viperEnvVariable("NODE_MULTIADDRESS", "filecoin-p2p-oracle")
+	SessionKey := viperEnvVariable("SESSION_KEY", "go")
 
 	return &Config{
-		ServerPort:       ServerPort,
+		BindAddress:      BindAddress,
 		LogLevel:         LogLevel,
 		NodeMultiaddress: NodeMultiaddress,
 		Rendezvous:       Rendezvous,
+		SessionKey:       SessionKey,
 	}
 }

@@ -14,6 +14,6 @@ WARNING! Building happen only when this project locates outside of GOPATH enviro
 
 ## Example .env file 
 
-1. SERVER_PORT=":8000"
+1. BIND_ADDRESS=":8000"
 2. LOG_LEVEL="debug"
 3. NODE_MULTIADDRESS="/ip4/127.0.0.1/tcp/0"

@@ -2,20 +2,19 @@ package server
 
 import (
 	"crypto/tls"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/fasthttp/router"
 	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/lab259/cors"
 	"github.com/sirupsen/logrus"
 	"github.com/valyala/fasthttp"
 )
 
 const (
-	sessionName        = "go"
-	ctxKeyUser  ctxKey = iota
+	ctxKeyUser ctxKey = iota
 	ctxKeyRequestID
 )
 
@@ -32,7 +31,15 @@ type Server struct {
 	TLSConfig    *tls.Config
 }
 
-func NewServer(sessionStore sessions.Store) *Server {
+// Start function starts server using provided config
+func Start(config *Config) error {
+	sessionStore := cookie.NewStore([]byte(config.SessionKey))
+	_, handler := NewServer(sessionStore)
+
+	return fasthttp.ListenAndServe(config.BindAddress, handler)
+}
+
+func NewServer(sessionStore sessions.Store) (*Server, fasthttp.RequestHandler) {
 	tlsConfig := &tls.Config{
 		// Causes servers to use Go's default cipher suite preferences,
 		// which are tuned to avoid attacks. Does nothing on clients.
@@ -64,12 +71,12 @@ func NewServer(sessionStore sessions.Store) *Server {
 		TLSConfig:    tlsConfig,
 	}
 
-	s.configureRouter()
+	handler := s.configureRouter()
 
-	return s
+	return s, handler
 }
 
-func (s *Server) configureRouter() {
+func (s *Server) configureRouter() fasthttp.RequestHandler {
 	cors := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*", "http://localhost:8080"},
 		AllowCredentials: true,
@@ -79,8 +86,7 @@ func (s *Server) configureRouter() {
 	s.router.GET("/", s.logRequest(s.Index))
 	handler := cors.Handler(s.router.Handler)
 
-	log.Fatal(fasthttp.ListenAndServe(":8080", handler))
-
+	return handler
 }
 
 func (s *Server) Index(ctx *fasthttp.RequestCtx) {
