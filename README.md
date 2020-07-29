@@ -11,3 +11,9 @@ WARNING! Building happen only when this project locates outside of GOPATH enviro
 1. Clone this repository
 2. Build binary files by `make build`
 3. Run created binaries
+
+## Example .env file 
+
+1. SERVER_PORT=":8000"
+2. LOG_LEVEL="debug"
+3. NODE_MULTIADDRESS="/ip4/127.0.0.1/tcp/0"
